@@ -94,7 +94,7 @@ service Gentest{
 	};
 	rpc SelectExtraByPk(Extra) returns(Extra){
 		option (persist.ql) = {
-			query:["SELECT f1,f3,f4,f2) FROM extraWHERE f1=@f1 && f3=@f3 && f4=@f4"],
+			query:["SELECT f1,f3,f4,f2) FROM extra WHERE f1=@f1 && f3=@f3 && f4=@f4"],
 		};
 	};
 	rpc DeleteExtra(Extra) returns(Extra){
@@ -109,12 +109,12 @@ service Gentest{
 	};
 	rpc InsertUsers(stream User) returns (User){
 		option (persist.ql) = {
-			query:["INSERT INTO users (id,name,friends) VALUES (@id,@name,friends)"],
+			query:["INSERT INTO users (id,name,friends) VALUES (@id,@name,@friends)"],
 		};
 	};
 	rpc SelectUserByPk(User) returns(User){
 		option (persist.ql) = {
-			query:["SELECT id,name,friends) FROM usersWHERE id=@id && name=@name"],
+			query:["SELECT id,name,friends) FROM users WHERE id=@id && name=@name"],
 		};
 	};
 	rpc DeleteUser(User) returns(User){
@@ -129,12 +129,12 @@ service Gentest{
 	};
 	rpc InsertFriendss(stream Friends) returns (Friends){
 		option (persist.ql) = {
-			query:["INSERT INTO friends (logger,names) VALUES (@logger,names)"],
+			query:["INSERT INTO friends (logger,names) VALUES (@logger,@names)"],
 		};
 	};
 	rpc SelectFriendsByPk(Friends) returns(Friends){
 		option (persist.ql) = {
-			query:["SELECT logger,names) FROM friendsWHERE logger=@logger"],
+			query:["SELECT logger,names) FROM friends WHERE logger=@logger"],
 		};
 	};
 	rpc DeleteFriends(Friends) returns(Friends){
