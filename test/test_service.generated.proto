@@ -10,7 +10,7 @@ service Gentest{
 	};
 	rpc SelectExtraByPk(Extra) returns(Extra){
 		option (persist.ql) = {
-			query:["SELECT f1,f3,f4,f2) FROM extraWHERE f1=@f1 && f3=@f3 && f4=@f4"],
+			query:["SELECT f1,f3,f4,f2) FROM extra WHERE f1=@f1 && f3=@f3 && f4=@f4"],
 		};
 	};
 	rpc DeleteExtra(Extra) returns(Extra){
@@ -20,7 +20,7 @@ service Gentest{
 	};
 	rpc UpdateExtra(Extra) returns(Extra){
 		option (persist.ql) = {
-			query:["UPDATE extra set f2=@f2 PK(f1=@f1,f3=@f3,f4=@f4)"],
+			query:["UPDATE extraset f2=@f2 PK(f1=@f1,f3=@f3,f4=@f4)"],
 		};
 	};
 	rpc InsertUsers(stream User) returns (User){
@@ -30,7 +30,7 @@ service Gentest{
 	};
 	rpc SelectUserByPk(User) returns(User){
 		option (persist.ql) = {
-			query:["SELECT id,name,friends) FROM usersWHERE id=@id && name=@name"],
+			query:["SELECT id,name,friends) FROM users WHERE id=@id && name=@name"],
 		};
 	};
 	rpc DeleteUser(User) returns(User){
@@ -40,7 +40,7 @@ service Gentest{
 	};
 	rpc UpdateUser(User) returns(User){
 		option (persist.ql) = {
-			query:["UPDATE users set friends=@friends PK(id=@id,name=@name)"],
+			query:["UPDATE usersset friends=@friends PK(id=@id,name=@name)"],
 		};
 	};
 	rpc InsertFriendss(stream Friends) returns (Friends){
@@ -50,7 +50,7 @@ service Gentest{
 	};
 	rpc SelectFriendsByPk(Friends) returns(Friends){
 		option (persist.ql) = {
-			query:["SELECT logger,names) FROM friendsWHERE logger=@logger"],
+			query:["SELECT logger,names) FROM friends WHERE logger=@logger"],
 		};
 	};
 	rpc DeleteFriends(Friends) returns(Friends){
@@ -60,7 +60,7 @@ service Gentest{
 	};
 	rpc UpdateFriends(Friends) returns(Friends){
 		option (persist.ql) = {
-			query:["UPDATE friends set names=@names PK(logger=@logger)"],
+			query:["UPDATE friendsset names=@names PK(logger=@logger)"],
 		};
 	};
 }

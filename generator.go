@@ -16,9 +16,12 @@ func generate(filepaths []string, protos []*gp.FileDescriptorProto) ([]*File, er
 	out := make([]*File, 0)
 	pkgs := oracle.Packages()
 	for _, pkg := range pkgs {
-		files := oracle.FilesIn(&pkg)
+		files := oracle.GenerationFilesIn(&pkg)
+		if len(files) == 0 {
+			continue
+		}
 		out = append(out, &File{
-			Name:    pkg.Name + "/service.generated.proto",
+			Name:    strings.Replace(pkg.Name, ".", "/", -1) + "/" + pkg.Name + "_service.generated.proto",
 			Content: "",
 		})
 		lo := out[len(out)-1]
@@ -31,9 +34,6 @@ func generate(filepaths []string, protos []*gp.FileDescriptorProto) ([]*File, er
 		lo.P("\toption (persist.service_type) = SPANNER;\n")
 
 		for _, f := range files {
-			if oracle.IsDependency(f.GetName()) {
-				continue
-			}
 			srcCode, err := ioutil.ReadFile(path.Clean(fmt.Sprintf("./%s", f.GetName())))
 			if err != nil {
 				return nil, nil, err
@@ -48,6 +48,7 @@ func generate(filepaths []string, protos []*gp.FileDescriptorProto) ([]*File, er
 					(l.Path[1] == 0 || l.Path[1] == 1) {
 					// must contain our subtext
 					if strings.HasPrefix(strings.Trim(*l.LeadingComments, " \t"), PKG_PREFIX) {
+
 						var important string
 						if len(l.Span) == 3 {
 							important = srcLines[l.Span[0]]
@@ -61,9 +62,9 @@ func generate(filepaths []string, protos []*gp.FileDescriptorProto) ([]*File, er
 						// and locating in files in our package
 						_, msg := oracle.GetDescriptorForComment(f, important)
 						oracle.WriteCrud(lo, msg, l.GetLeadingComments())
-
 					}
 				}
+
 			}
 		}
 		lo.P("}\n")
@@ -74,6 +75,32 @@ func generate(filepaths []string, protos []*gp.FileDescriptorProto) ([]*File, er
 
 type Oracle struct {
 	protos []*gp.FileDescriptorProto
+}
+
+func (o Oracle) GenerationFilesIn(pkg *Package) []*gp.FileDescriptorProto {
+	out := make([]*gp.FileDescriptorProto, 0)
+	files := o.FilesIn(pkg)
+	for _, f := range files {
+		if o.IsDependency(f.GetName()) {
+			continue
+		}
+		var hasComment bool
+		for _, l := range f.SourceCodeInfo.Location {
+			// grab whole messages with a leading comment
+			if l.LeadingComments != nil &&
+				len(l.Path) == 2 && l.Path[0] == 4 &&
+				(l.Path[1] == 0 || l.Path[1] == 1) {
+				// must contain our subtext
+				if strings.HasPrefix(strings.Trim(*l.LeadingComments, " \t"), PKG_PREFIX) {
+					hasComment = true
+				}
+			}
+		}
+		if hasComment {
+			out = append(out, f)
+		}
+	}
+	return out
 }
 
 // bad function name.  comment is not a comment, but a source code snippet
@@ -228,7 +255,7 @@ func (o Oracle) WriteCrud(f *File, msg *gp.DescriptorProto, comment string) {
 	for i := 0; i < len(all)-1; i++ {
 		f.P(all[i], ",")
 	}
-	f.P(all[len(all)-1], ") FROM ", table, "WHERE ")
+	f.P(all[len(all)-1], ") FROM ", table, " WHERE ")
 	for i := 0; i < len(pk)-1; i++ {
 		f.P(pk[i], "=@", pk[i], " && ")
 	}
@@ -248,11 +275,11 @@ func (o Oracle) WriteCrud(f *File, msg *gp.DescriptorProto, comment string) {
 
 	f.P("\trpc Update", n, "(", n, ") returns(", n, "){\n")
 	f.P("\t\toption (persist.ql) = {\n\t\t\tquery:[")
-	f.P(`"UPDATE `, table, " ")
+	f.P(`"UPDATE `, table, "set ")
 	for i := 0; i < len(notPks)-1; i++ {
-		f.P("set ", notPks[i], "=@", notPks[i], ", ")
+		f.P(notPks[i], "=@", notPks[i], ", ")
 	}
-	f.P("set ", notPks[len(notPks)-1], "=@", notPks[len(notPks)-1], " ")
+	f.P(notPks[len(notPks)-1], "=@", notPks[len(notPks)-1], " ")
 	f.P("PK(")
 	for i := 0; i < len(pk)-1; i++ {
 		f.P(pk[i], "=@", pk[i], ",")
