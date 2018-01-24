@@ -160,4 +160,4 @@ This plugin is not smart enough to generate imports,  or persist type mappings y
 1. run protoc again with the persist options.
 
 
-protoc-gen-persist has documentation on how to work that plugin [HERE]((https://github.com/tcncloud/protoc-gen-persist/tree/master))
+protoc-gen-persist has documentation on how to work that plugin [HERE](https://github.com/tcncloud/protoc-gen-persist/tree/master)
