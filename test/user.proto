@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package test;
+
+//pserv-table=users
+//pserv-pk=id, name
+message User {
+    //test stuff in the comment    
+	int64 id = 1;
+	string name = 2; //test extra at the end of things
+	Friends friends = 3;
+}
+
+//pserv-table=friends
+//pserv-pk=logger
+message Friends {
+    string names  = 1;
+    
+    string logger = 2;
+}
+
