@@ -155,6 +155,7 @@ lots of writing we no longer have to do from 3 comments over protobuf messages.
 
 This plugin is not smart enough to generate imports,  or persist type mappings yet.  So you will have to 
 1. rename this file (just take out the "generated." part of the filename)
+1. add all imports needed
 1. add all type mappings
 1. add additional queries
 1. run protoc again with the persist options.
