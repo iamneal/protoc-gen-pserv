@@ -1,0 +1,66 @@
+syntax = "proto3";
+package test;
+import "persist/options.proto";
+service Gentest{
+	option (persist.service_type) = SPANNER;
+	rpc InsertExtras(stream Extra) returns (Extra){
+		option (persist.ql) = {
+			query:["INSERT INTO extra (f1,f3,f4,f2) VALUES (@f1,@f3,@f4,f2)"],
+		};
+	};
+	rpc SelectExtraByPk(Extra) returns(Extra){
+		option (persist.ql) = {
+			query:["SELECT f1,f3,f4,f2) FROM extraWHERE f1=@f1 && f3=@f3 && f4=@f4"],
+		};
+	};
+	rpc DeleteExtra(Extra) returns(Extra){
+		option (persist.ql) = {
+			query:["DELETE FROM extra VALUES(@f1,@f3,@f4)"],
+		};
+	};
+	rpc UpdateExtra(Extra) returns(Extra){
+		option (persist.ql) = {
+			query:["UPDATE extra set f2=@f2 PK(f1=@f1,f3=@f3,f4=@f4)"],
+		};
+	};
+	rpc InsertUsers(stream User) returns (User){
+		option (persist.ql) = {
+			query:["INSERT INTO users (id,name,friends) VALUES (@id,@name,friends)"],
+		};
+	};
+	rpc SelectUserByPk(User) returns(User){
+		option (persist.ql) = {
+			query:["SELECT id,name,friends) FROM usersWHERE id=@id && name=@name"],
+		};
+	};
+	rpc DeleteUser(User) returns(User){
+		option (persist.ql) = {
+			query:["DELETE FROM users VALUES(@id,@name)"],
+		};
+	};
+	rpc UpdateUser(User) returns(User){
+		option (persist.ql) = {
+			query:["UPDATE users set friends=@friends PK(id=@id,name=@name)"],
+		};
+	};
+	rpc InsertFriendss(stream Friends) returns (Friends){
+		option (persist.ql) = {
+			query:["INSERT INTO friends (logger,names) VALUES (@logger,names)"],
+		};
+	};
+	rpc SelectFriendsByPk(Friends) returns(Friends){
+		option (persist.ql) = {
+			query:["SELECT logger,names) FROM friendsWHERE logger=@logger"],
+		};
+	};
+	rpc DeleteFriends(Friends) returns(Friends){
+		option (persist.ql) = {
+			query:["DELETE FROM friends VALUES(@logger)"],
+		};
+	};
+	rpc UpdateFriends(Friends) returns(Friends){
+		option (persist.ql) = {
+			query:["UPDATE friends set names=@names PK(logger=@logger)"],
+		};
+	};
+}
