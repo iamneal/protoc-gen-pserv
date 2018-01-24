@@ -32,7 +32,8 @@ func generate(filepaths []string, protos []*gp.FileDescriptorProto) ([]*File, er
 		lo.P(`import "persist/options.proto";`, "\n")
 		lo.P("service ", "Gen", strings.Replace(pkg.Name, ".", "_", -1), "{\n")
 		lo.P("\toption (persist.service_type) = SPANNER;\n")
-
+		// uncomment to get comment info for when something breaks.
+		// debugPrintSourceInfoToFile(lo, files)
 		for _, f := range files {
 			srcCode, err := ioutil.ReadFile(path.Clean(fmt.Sprintf("./%s", f.GetName())))
 			if err != nil {
@@ -44,8 +45,7 @@ func generate(filepaths []string, protos []*gp.FileDescriptorProto) ([]*File, er
 			for _, l := range f.SourceCodeInfo.Location {
 				// grab whole messages with a leading comment
 				if l.LeadingComments != nil &&
-					len(l.Path) == 2 && l.Path[0] == 4 &&
-					(l.Path[1] == 0 || l.Path[1] == 1) {
+					len(l.Path) == 2 && l.Path[0] == 4 {
 					// must contain our subtext
 					if strings.HasPrefix(strings.Trim(*l.LeadingComments, " \t"), PKG_PREFIX) {
 
@@ -88,8 +88,7 @@ func (o Oracle) GenerationFilesIn(pkg *Package) []*gp.FileDescriptorProto {
 		for _, l := range f.SourceCodeInfo.Location {
 			// grab whole messages with a leading comment
 			if l.LeadingComments != nil &&
-				len(l.Path) == 2 && l.Path[0] == 4 &&
-				(l.Path[1] == 0 || l.Path[1] == 1) {
+				len(l.Path) == 2 && l.Path[0] == 4 {
 				// must contain our subtext
 				if strings.HasPrefix(strings.Trim(*l.LeadingComments, " \t"), PKG_PREFIX) {
 					hasComment = true
@@ -275,7 +274,7 @@ func (o Oracle) WriteCrud(f *File, msg *gp.DescriptorProto, comment string) {
 
 	f.P("\trpc Update", n, "(", n, ") returns(", n, "){\n")
 	f.P("\t\toption (persist.ql) = {\n\t\t\tquery:[")
-	f.P(`"UPDATE `, table, "set ")
+	f.P(`"UPDATE `, table, " set ")
 	for i := 0; i < len(notPks)-1; i++ {
 		f.P(notPks[i], "=@", notPks[i], ", ")
 	}
@@ -303,4 +302,20 @@ func (f *File) P(args ...interface{}) {
 type Package struct {
 	Name  string // name of the protobuf package given to the descriptor
 	GoPkg string // the go_package option if there is one
+}
+
+func debugPrintSourceInfoToFile(dest *File, srcs []*gp.FileDescriptorProto) {
+	dest.P("// debug info")
+	for _, src := range srcs {
+		dest.P("// file name: ", src.GetName())
+		dest.P("len of locations: ", fmt.Sprintf("%d", len(src.SourceCodeInfo.GetLocation())), "\n")
+		for _, l := range src.SourceCodeInfo.Location {
+			dest.P("// leading comments:  ", fmt.Sprintf("%#v", l.GetLeadingComments()), "\n")
+			dest.P("// leading detached:  ", fmt.Sprintf("%#v", l.GetLeadingDetachedComments()), "\n")
+			dest.P("// trailing comments: ", fmt.Sprintf("%#v", l.GetTrailingComments()), "\n")
+			dest.P("// path:    ", fmt.Sprintf("%#v", l.GetPath()), "\n")
+			dest.P("// span:    ", fmt.Sprintf("%#v", l.GetSpan()), "\n\n")
+		}
+	}
+	dest.P("// end debug info")
 }

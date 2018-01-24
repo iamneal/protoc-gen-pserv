@@ -20,7 +20,7 @@ service Gentest{
 	};
 	rpc UpdateExtra(Extra) returns(Extra){
 		option (persist.ql) = {
-			query:["UPDATE extraset f2=@f2 PK(f1=@f1,f3=@f3,f4=@f4)"],
+			query:["UPDATE extra set f2=@f2 PK(f1=@f1,f3=@f3,f4=@f4)"],
 		};
 	};
 	rpc InsertUsers(stream User) returns (User){
@@ -40,7 +40,7 @@ service Gentest{
 	};
 	rpc UpdateUser(User) returns(User){
 		option (persist.ql) = {
-			query:["UPDATE usersset friends=@friends PK(id=@id,name=@name)"],
+			query:["UPDATE users set friends=@friends PK(id=@id,name=@name)"],
 		};
 	};
 	rpc InsertFriendss(stream Friends) returns (Friends){
@@ -60,7 +60,7 @@ service Gentest{
 	};
 	rpc UpdateFriends(Friends) returns(Friends){
 		option (persist.ql) = {
-			query:["UPDATE friendsset names=@names PK(logger=@logger)"],
+			query:["UPDATE friends set names=@names PK(logger=@logger)"],
 		};
 	};
 }
