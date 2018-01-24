@@ -2,8 +2,6 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
-	"path"
 	"strings"
 
 	gp "github.com/golang/protobuf/protoc-gen-go/descriptor"
@@ -35,12 +33,6 @@ func generate(filepaths []string, protos []*gp.FileDescriptorProto) ([]*File, er
 		// uncomment to get comment info for when something breaks.
 		// debugPrintSourceInfoToFile(lo, files)
 		for _, f := range files {
-			srcCode, err := ioutil.ReadFile(path.Clean(fmt.Sprintf("./%s", f.GetName())))
-			if err != nil {
-				return nil, nil, err
-			}
-			srcLines := strings.Split(string(srcCode), "\n")
-
 			// lookup all this files comments
 			for _, l := range f.SourceCodeInfo.Location {
 				// grab whole messages with a leading comment
@@ -48,23 +40,10 @@ func generate(filepaths []string, protos []*gp.FileDescriptorProto) ([]*File, er
 					len(l.Path) == 2 && l.Path[0] == 4 {
 					// must contain our subtext
 					if strings.HasPrefix(strings.Trim(*l.LeadingComments, " \t"), PKG_PREFIX) {
-
-						var important string
-						if len(l.Span) == 3 {
-							important = srcLines[l.Span[0]]
-						} else if len(l.Span) == 4 {
-							for i := l.Span[0]; i < l.Span[2]; i++ {
-								important += srcLines[i] + "\n"
-							}
-						}
-						// find the message by parsing the message name
-						// concatting to the package
-						// and locating in files in our package
-						_, msg := oracle.GetDescriptorForComment(f, important)
+						msg := f.GetMessageType()[l.Path[1]]
 						oracle.WriteCrud(lo, msg, l.GetLeadingComments())
 					}
 				}
-
 			}
 		}
 		lo.P("}\n")
