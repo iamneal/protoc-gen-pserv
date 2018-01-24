@@ -218,7 +218,7 @@ func (o Oracle) WriteCrud(f *File, msg *gp.DescriptorProto, comment string) {
 	for i := 0; i < len(all)-1; i++ {
 		f.P("@", all[i], ",")
 	}
-	f.P(all[len(all)-1], `)"`)
+	f.P("@", all[len(all)-1], `)"`)
 	f.P("],\n\t\t};\n")
 	f.P("\t};\n")
 

@@ -89,7 +89,7 @@ service Gentest{
 	option (persist.service_type) = SPANNER;
 	rpc InsertExtras(stream Extra) returns (Extra){
 		option (persist.ql) = {
-			query:["INSERT INTO extra (f1,f3,f4,f2) VALUES (@f1,@f3,@f4,f2)"],
+			query:["INSERT INTO extra (f1,f3,f4,f2) VALUES (@f1,@f3,@f4,@f2)"],
 		};
 	};
 	rpc SelectExtraByPk(Extra) returns(Extra){

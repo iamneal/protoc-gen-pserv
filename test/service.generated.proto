@@ -5,7 +5,7 @@ service Gentest{
 	option (persist.service_type) = SPANNER;
 	rpc InsertExtras(stream Extra) returns (Extra){
 		option (persist.ql) = {
-			query:["INSERT INTO extra (f1,f3,f4,f2) VALUES (@f1,@f3,@f4,f2)"],
+			query:["INSERT INTO extra (f1,f3,f4,f2) VALUES (@f1,@f3,@f4,@f2)"],
 		};
 	};
 	rpc SelectExtraByPk(Extra) returns(Extra){
@@ -25,7 +25,7 @@ service Gentest{
 	};
 	rpc InsertUsers(stream User) returns (User){
 		option (persist.ql) = {
-			query:["INSERT INTO users (id,name,friends) VALUES (@id,@name,friends)"],
+			query:["INSERT INTO users (id,name,friends) VALUES (@id,@name,@friends)"],
 		};
 	};
 	rpc SelectUserByPk(User) returns(User){
@@ -45,7 +45,7 @@ service Gentest{
 	};
 	rpc InsertFriendss(stream Friends) returns (Friends){
 		option (persist.ql) = {
-			query:["INSERT INTO friends (logger,names) VALUES (@logger,names)"],
+			query:["INSERT INTO friends (logger,names) VALUES (@logger,@names)"],
 		};
 	};
 	rpc SelectFriendsByPk(Friends) returns(Friends){
